@@ -71,6 +71,9 @@ update msg model =
                     , Cmd.none
                     )
 
+        NavbarMsg state ->
+            ( { model | navbarState = state }, Cmd.none )
+
         Navigate cwd ->
             ( { model
                 | debugMessages = (("Navigate: " ++ toString cwd) :: model.debugMessages)

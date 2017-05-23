@@ -9,19 +9,23 @@ import Nerves.SystemConfig.Messages exposing (Msg(..))
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Navbar as Navbar
 
 
 view : Model -> Html Msg
 view model =
     let
-        cwd =
-            List.reverse model.cwd
-
         branch =
-            getBranch cwd model.registryGlobal
+            getBranch (List.reverse model.cwd) model.registryGlobal
     in
         div [ class "navigation" ]
             [ CDN.stylesheet
+            , Navbar.config NavbarMsg
+                |> Navbar.withAnimation
+                |> Navbar.brand [ onClick (Navigate []) ] [ text "SystemConfig" ]
+                |> Navbar.items
+                    (renderBreadcrumb model.cwd [])
+                |> Navbar.view model.navbarState
             , Grid.container []
                 [ ListGroup.ul
                     (renderBranch branch model.cwd)
@@ -51,20 +55,16 @@ renderNode : List String -> String -> JsVal -> ListGroup.Item Msg
 renderNode cwd key value =
     case value of
         JsString value ->
-            ListGroup.li []
-                [ text (toString value) ]
+            renderLeaf key value
 
         JsInt value ->
-            ListGroup.li []
-                [ text (toString value) ]
+            renderLeaf key (toString value)
 
         JsFloat value ->
-            ListGroup.li []
-                [ text (toString value) ]
+            renderLeaf key (toString value)
 
         JsArray value ->
-            ListGroup.li []
-                [ text (toString value) ]
+            renderLeaf key (renderList value)
 
         JsObject obj ->
             ListGroup.li []
@@ -76,6 +76,42 @@ renderNode cwd key value =
                 [ text "nil" ]
 
 
+renderList : List JsVal -> String
+renderList list =
+    list
+        |> List.map
+            (\item ->
+                case item of
+                    JsString value ->
+                        value
+
+                    JsInt value ->
+                        toString value
+
+                    JsFloat value ->
+                        toString value
+
+                    JsArray value ->
+                        renderList value
+
+                    JsObject obj ->
+                        "%{...}"
+
+                    JsNull ->
+                        "nil"
+            )
+        |> List.intersperse ", "
+        |> List.foldr (++) ""
+
+
+renderLeaf : String -> String -> ListGroup.Item Msg
+renderLeaf key value =
+    ListGroup.li []
+        [ span [] [ text (key ++ ":") ]
+        , span [] [ text (toString value) ]
+        ]
+
+
 renderBranch : RegistryNode -> List String -> List (ListGroup.Item Msg)
 renderBranch branch cwd =
     Dict.toList branch
@@ -83,3 +119,14 @@ renderBranch branch cwd =
             (\( k, v ) ->
                 (renderNode cwd k v)
             )
+
+
+renderBreadcrumb : List String -> List (Navbar.Item Msg) -> List (Navbar.Item Msg)
+renderBreadcrumb cwd items =
+    case cwd of
+        [] ->
+            items
+
+        h :: t ->
+            (Navbar.itemLink [ onClick (Navigate (h :: t)) ] [ text h ] :: items)
+                |> renderBreadcrumb t

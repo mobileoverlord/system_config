@@ -10,6 +10,7 @@ import Phoenix.Socket
 import Phoenix.Channel
 import Phoenix.Push
 import Dict
+import Bootstrap.Navbar as Navbar
 
 
 init : ( Model, Cmd Msg )
@@ -33,13 +34,17 @@ init =
 
         ( phxSocket, registryCmd ) =
             Phoenix.Socket.join registryChannel startPhxSocket
+
+        ( navbarState, navbarCmd ) =
+            Navbar.initialState NavbarMsg
     in
         ( { debugMessages = debugMessages
           , registryGlobal = registryGlobal
           , phxSocket = phxSocket
           , cwd = []
+          , navbarState = navbarState
           }
-        , Cmd.batch [ Cmd.map PhxSocketMessage registryCmd ]
+        , Cmd.batch [ Cmd.map PhxSocketMessage registryCmd, navbarCmd ]
         )
 
 

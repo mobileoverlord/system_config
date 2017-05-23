@@ -4,6 +4,7 @@ import Nerves.SystemConfig.Messages exposing (Msg)
 import Phoenix.Socket exposing (Socket)
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder, dict)
+import Bootstrap.Navbar as Navbar
 
 
 type JsVal
@@ -24,6 +25,7 @@ type alias Model =
     , debugMessages : List String
     , registryGlobal : RegistryNode
     , cwd : List String
+    , navbarState : Navbar.State
     }
 
 
