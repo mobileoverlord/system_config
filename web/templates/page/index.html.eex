@@ -1,0 +1,2 @@
+<script src="<%= static_url(@conn, "/js/main.js") %>"></script>
+<div id="elm-container"></div>
