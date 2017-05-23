@@ -3,7 +3,7 @@ module Nerves.SystemConfig.Main exposing (main)
 import Html exposing (Html)
 import Nerves.SystemConfig.Messages exposing (Msg(..))
 import Nerves.SystemConfig.Subscriptions exposing (subscriptions)
-import Nerves.SystemConfig.Model exposing (Model, JsVal(..))
+import Nerves.SystemConfig.Model exposing (Model, JsVal(..), RegistryNode)
 import Nerves.SystemConfig.Update exposing (update)
 import Nerves.SystemConfig.View exposing (view)
 import Phoenix.Socket
@@ -37,7 +37,7 @@ init =
         ( { debugMessages = debugMessages
           , registryGlobal = registryGlobal
           , phxSocket = phxSocket
-          , pwd = []
+          , cwd = []
           }
         , Cmd.batch [ Cmd.map PhxSocketMessage registryCmd ]
         )
@@ -50,9 +50,9 @@ initPhxSocket url =
         |> Phoenix.Socket.on "global" "registry" ReceiveRegistryMessage
 
 
-initRegistryNode : JsVal
+initRegistryNode : RegistryNode
 initRegistryNode =
-    JsObject Dict.empty
+    Dict.empty
 
 
 main =

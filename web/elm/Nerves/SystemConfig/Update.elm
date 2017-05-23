@@ -1,6 +1,6 @@
 module Nerves.SystemConfig.Update exposing (update)
 
-import Nerves.SystemConfig.Model exposing (Model, registryMessageDecoder)
+import Nerves.SystemConfig.Model exposing (Model, registryNodeDecoder)
 import Nerves.SystemConfig.Messages exposing (Msg(..))
 import Phoenix.Socket exposing (update)
 import Json.Decode as JD
@@ -19,7 +19,7 @@ update msg model =
                 )
 
         OnChannelJoin channelName json ->
-            case JD.decodeValue registryMessageDecoder json of
+            case JD.decodeValue registryNodeDecoder json of
                 Ok registryMessage ->
                     ( { model
                         | registryGlobal = registryMessage
@@ -56,7 +56,7 @@ update msg model =
             )
 
         ReceiveRegistryMessage json ->
-            case JD.decodeValue registryMessageDecoder json of
+            case JD.decodeValue registryNodeDecoder json of
                 Ok registryMessage ->
                     ( { model
                         | registryGlobal = registryMessage
@@ -70,3 +70,11 @@ update msg model =
                       }
                     , Cmd.none
                     )
+
+        Navigate cwd ->
+            ( { model
+                | debugMessages = (("Navigate: " ++ toString cwd) :: model.debugMessages)
+                , cwd = cwd
+              }
+            , Cmd.none
+            )

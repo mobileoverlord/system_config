@@ -11,3 +11,4 @@ type Msg
     | OnChannelError String JE.Value
     | OnChannelClose String JE.Value
     | ReceiveRegistryMessage JE.Value
+    | Navigate (List String)

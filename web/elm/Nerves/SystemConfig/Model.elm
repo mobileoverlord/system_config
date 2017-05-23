@@ -1,8 +1,8 @@
-module Nerves.SystemConfig.Model exposing (Model, JsVal(..), registryMessageDecoder)
+module Nerves.SystemConfig.Model exposing (Model, JsVal(..), RegistryNode, registryNodeDecoder)
 
 import Nerves.SystemConfig.Messages exposing (Msg)
 import Phoenix.Socket exposing (Socket)
-import Dict
+import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder, dict)
 
 
@@ -16,15 +16,20 @@ type JsVal
 
 
 type alias RegistryNode =
-    Dict.Dict String JsVal
+    Dict String JsVal
 
 
 type alias Model =
     { phxSocket : Phoenix.Socket.Socket Msg
     , debugMessages : List String
-    , registryGlobal : JsVal
-    , pwd : List String
+    , registryGlobal : RegistryNode
+    , cwd : List String
     }
+
+
+registryNodeDecoder : Decoder RegistryNode
+registryNodeDecoder =
+    JD.dict (JD.lazy (\_ -> registryMessageDecoder))
 
 
 registryMessageDecoder : Decoder JsVal

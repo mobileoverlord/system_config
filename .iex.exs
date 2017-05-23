@@ -1,4 +1,16 @@
 defmodule R do
+  def test do
+    value = %{
+      a: 1,
+      b: [1, 2],
+      c: "3",
+      d: %{
+        e: "f"
+      }
+    }
+    SystemRegistry.update([:state], value)
+  end
+
   def up(link) do
     value = %{
       address: "192.168.1.100",
