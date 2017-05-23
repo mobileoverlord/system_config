@@ -37,6 +37,7 @@ init =
         ( { debugMessages = debugMessages
           , registryGlobal = registryGlobal
           , phxSocket = phxSocket
+          , pwd = []
           }
         , Cmd.batch [ Cmd.map PhxSocketMessage registryCmd ]
         )
@@ -59,5 +60,5 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }

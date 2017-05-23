@@ -23,6 +23,7 @@ type alias Model =
     { phxSocket : Phoenix.Socket.Socket Msg
     , debugMessages : List String
     , registryGlobal : JsVal
+    , pwd : List String
     }
 
 
