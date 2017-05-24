@@ -43,6 +43,7 @@ init =
           , phxSocket = phxSocket
           , cwd = []
           , navbarState = navbarState
+          , pendingChanges = Dict.empty
           }
         , Cmd.batch [ Cmd.map PhxSocketMessage registryCmd, navbarCmd ]
         )

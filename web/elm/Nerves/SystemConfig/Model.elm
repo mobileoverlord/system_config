@@ -26,6 +26,7 @@ type alias Model =
     , registryGlobal : RegistryNode
     , cwd : List String
     , navbarState : Navbar.State
+    , pendingChanges : Dict String String
     }
 
 

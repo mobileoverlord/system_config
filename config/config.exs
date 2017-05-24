@@ -19,7 +19,7 @@ config :logger, :console,
   metadata: [:request_id]
 
 config :system_registry, SystemRegistry.Processor.Config,
-  priorities: [:debug]
+  priorities: [:debug, :default]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

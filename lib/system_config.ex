@@ -10,6 +10,7 @@ defmodule SystemConfig do
     children = [
       # Start the endpoint when the application starts
       supervisor(SystemConfig.Endpoint, []),
+      worker(SystemConfig.Processor.ConfigMeta, []),
       worker(SystemConfig.SystemRegistry, []),
       # Start your own worker by calling: SystemConfig.Worker.start_link(arg1, arg2, arg3)
       # worker(SystemConfig.Worker, [arg1, arg2, arg3]),

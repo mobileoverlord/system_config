@@ -10,13 +10,27 @@ import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Navbar as Navbar
+import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.Form.Input as Input
+import Bootstrap.Button as Button
 
 
 view : Model -> Html Msg
 view model =
     let
+        rev =
+            List.reverse model.cwd
+
         branch =
-            getBranch (List.reverse model.cwd) model.registryGlobal
+            getBranch rev model.registryGlobal
+
+        editable =
+            case rev of
+                "config" :: _ ->
+                    True
+
+                _ ->
+                    False
     in
         div [ class "navigation" ]
             [ CDN.stylesheet
@@ -27,8 +41,7 @@ view model =
                     (renderBreadcrumb model.cwd [])
                 |> Navbar.view model.navbarState
             , Grid.container []
-                [ ListGroup.ul
-                    (renderBranch branch model.cwd)
+                [ renderBranch editable branch model.cwd
                 ]
             ]
 
@@ -51,20 +64,20 @@ getBranch cwd branch =
                     branch
 
 
-renderNode : List String -> String -> JsVal -> ListGroup.Item Msg
-renderNode cwd key value =
+renderNode : Bool -> List String -> String -> JsVal -> ListGroup.Item Msg
+renderNode editable cwd key value =
     case value of
         JsString value ->
-            renderLeaf key value
+            renderLeaf editable key value
 
         JsInt value ->
-            renderLeaf key (toString value)
+            renderLeaf editable key (toString value)
 
         JsFloat value ->
-            renderLeaf key (toString value)
+            renderLeaf editable key (toString value)
 
         JsArray value ->
-            renderLeaf key (renderList value)
+            renderLeaf editable key (renderList value)
 
         JsObject obj ->
             ListGroup.li []
@@ -104,21 +117,41 @@ renderList list =
         |> List.foldr (++) ""
 
 
-renderLeaf : String -> String -> ListGroup.Item Msg
-renderLeaf key value =
+renderLeaf : Bool -> String -> String -> ListGroup.Item Msg
+renderLeaf editable key value =
     ListGroup.li []
-        [ span [] [ text (key ++ ":") ]
-        , span [] [ text (toString value) ]
+        [ InputGroup.config
+            (InputGroup.text [ Input.disabled (not editable), Input.defaultValue value, Input.onInput (\v -> CacheValue key v) ])
+            |> InputGroup.small
+            |> InputGroup.predecessors
+                [ InputGroup.span [] [ text key ] ]
+            |> renderSuccessors editable key
+            |> InputGroup.view
         ]
 
 
-renderBranch : RegistryNode -> List String -> List (ListGroup.Item Msg)
-renderBranch branch cwd =
-    Dict.toList branch
-        |> List.map
-            (\( k, v ) ->
-                (renderNode cwd k v)
-            )
+renderSuccessors : Bool -> String -> InputGroup.Config Msg -> InputGroup.Config Msg
+renderSuccessors editable key inputGroup =
+    case editable of
+        True ->
+            inputGroup
+                |> InputGroup.successors
+                    [ InputGroup.button [ Button.disabled (not editable), Button.success, Button.onClick (SaveValue key) ] [ text "✓" ] ]
+
+        False ->
+            inputGroup
+
+
+renderBranch : Bool -> RegistryNode -> List String -> Html Msg
+renderBranch editable branch cwd =
+    ListGroup.ul
+        (Dict.toList
+            branch
+            |> List.map
+                (\( k, v ) ->
+                    (renderNode editable cwd k v)
+                )
+        )
 
 
 renderBreadcrumb : List String -> List (Navbar.Item Msg) -> List (Navbar.Item Msg)

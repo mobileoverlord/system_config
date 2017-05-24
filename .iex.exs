@@ -17,18 +17,29 @@ defmodule R do
       subnet: "255.255.255.0",
       router: "192.168.1.1",
       dns: ["8.8.8.8", "8.8.4.4"]}
-    scope(link)
+    state_scope(link)
     |> SystemRegistry.update(value)
+
+    value = %{
+      address: "192.168.1.100",
+      subnet: "255.255.255.0",
+      router: "192.168.1.1",
+      dns: ["8.8.8.8", "8.8.4.4"]}
+    config_scope(link)
+    |> SystemRegistry.update(value, priority: :default)
   end
 
   def down(link) do
-    scope(link)
+    state_scope(link)
+    |> SystemRegistry.delete()
+    config_scope(link)
     |> SystemRegistry.delete()
   end
 
   def mod(link, key, value) do
-    SystemRegistry.update(scope(link) ++ [key], value)
+    SystemRegistry.update(state_scope(link) ++ [key], value)
   end
 
-  defp scope(link), do: [:state, :network_interface, link]
+  defp state_scope(link), do: [:state, :network_interface, link]
+  defp config_scope(link), do: [:config, :network_interface, link]
 end

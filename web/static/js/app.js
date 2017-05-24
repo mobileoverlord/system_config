@@ -22,4 +22,4 @@ import "phoenix_html"
 
 // Set up our Elm App
 const elmDiv = document.querySelector('#elm-container');
-const elmApp = Elm.Main.embed(elmDiv);
+const elmApp = Elm.Nerves.SystemConfig.Main.embed(elmDiv);
